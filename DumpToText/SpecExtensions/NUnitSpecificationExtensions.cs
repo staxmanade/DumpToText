@@ -73,6 +73,11 @@ public static class NUnitSpecificationExtensions
         return expected;
     }
 
+    public static void ShouldBeOfType<T>(this object actual)
+    {
+        ShouldBeOfType(actual, typeof (T));
+    }
+    
     public static void ShouldBeOfType(this object actual, Type expected)
     {
         Assert.IsInstanceOf(expected, actual);
