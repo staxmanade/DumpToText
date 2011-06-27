@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace DumpToText
+namespace DumpToText.Tests
 {
 	public class CollectionObjectTests
 	{

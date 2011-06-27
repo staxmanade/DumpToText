@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using NUnit.Framework;
 
-namespace DumpToText
+namespace DumpToText.Tests
 {
 	public class DumpItemBaseTests
 	{

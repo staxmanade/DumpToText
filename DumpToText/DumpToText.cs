@@ -54,13 +54,13 @@ namespace DumpToText
 
 		public static string TextForEmptyCollectionOf(Type type)
 		{
-			return PrintTypeName(type) + " (0 items)";
+			return PrettifyTypeName(type) + " (0 items)";
 		}
 
-		private static string PrintTypeName(Type type)
+		private static string PrettifyTypeName(Type type)
 		{
 			if (type.IsGenericType)
-				return type.Name.Substring(0, type.Name.Length - 2) + "<" + string.Join(", ", type.GetGenericArguments().Select(PrintTypeName).ToArray()) + ">";
+				return type.Name.Substring(0, type.Name.Length - 2) + "<" + string.Join(", ", type.GetGenericArguments().Select(PrettifyTypeName).ToArray()) + ">";
 
 			return type.Name;
 		}
