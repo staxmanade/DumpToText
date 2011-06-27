@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace DumpToText.Tests
@@ -17,6 +18,14 @@ namespace DumpToText.Tests
 		public void CollectionObject_EmptyArray()
 		{
 			CollectionAssertHelper(typeof(CollectionObject), new int[0], DumpItemBase.TextForEmptyCollectionOf(typeof(int[])));
+		}
+
+		[Test]
+		public void CollectionWithItems()
+		{
+			var items = new[] {1, 2, 3};
+			var dumpItemBase = ObjectTypeFactory.Create(items);
+			dumpItemBase.Children.Count().ShouldEqual(3);
 		}
 	}
 }

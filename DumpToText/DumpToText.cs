@@ -40,8 +40,9 @@ namespace DumpToText
 			if (item is string)
 				return new ValueObject(item);
 
-			if (item is IEnumerable)
-				return new CollectionObject(item);
+			var enumerableItem = item as IEnumerable;
+			if (enumerableItem != null)
+				return new CollectionObject(enumerableItem);
 
 			return new ReferenceObject(item);
 		}
@@ -106,20 +107,30 @@ namespace DumpToText
 
 	public class CollectionObject : DumpItemBase
 	{
-		private readonly object _item;
+		private readonly IEnumerable _items;
 
-		public CollectionObject(object item)
+		public CollectionObject(IEnumerable items)
 		{
-			_item = item;
+			_items = items;
 		}
 
 		public override string Value
 		{
 			get
 			{
-				return TextForEmptyCollectionOf(_item.GetType());
+				return TextForEmptyCollectionOf(_items.GetType());
 			}
 		}
 
+		public override IEnumerable<DumpItemBase> Children
+		{
+			get
+			{
+				foreach (var item in _items)
+				{
+					yield return ObjectTypeFactory.Create(item);
+				}
+			}
+		}
 	}
 }
