@@ -39,6 +39,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tests\DumpToTextTests.cs" />
     <Compile Include="Tests\ReferenceObjectTests.cs" />
     <Compile Include="Tests\ValueObjectTests.cs" />
     <Compile Include="Tests\CollectionObjectTests.cs" />

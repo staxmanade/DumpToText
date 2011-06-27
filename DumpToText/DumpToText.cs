@@ -3,9 +3,19 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 namespace DumpToText
 {
+	public static class DumpToTextExtensions
+	{
+		public static string DumpToText(this object item)
+		{
+			var dumpItemBase = ObjectTypeFactory.Create(item);
+
+			return dumpItemBase.Value;
+		}
+	}
 	public class ValueObject : DumpItemBase
 	{
 		private readonly object _o;
@@ -59,17 +69,62 @@ namespace DumpToText
 
 		public override string Value
 		{
-			get { return PrettifyTypeName(_item.GetType()); }
+			get
+			{
+				var sb = new StringBuilder();
+
+				var name = PrettifyTypeName(_item.GetType());
+
+				var maxPropertyWidth = Properties.Max(p => p.PropertyInfo.Name.Length);
+				var maxValueWidth = Properties.Max(p => p.Value.Value.Length);
+				var totalWidth = new[] { name.Length , maxPropertyWidth + maxValueWidth }.Max();
+
+				Action writeDividerLine = () =>
+				{
+					sb.Append("|");
+					sb.Append(new string('-', totalWidth + 2));
+					sb.AppendLine("|");
+				};
+
+				Action<string> writeTextLine = lineToWrite =>
+				{
+					sb.Append("| ");
+					sb.Append(lineToWrite);
+					sb.AppendLine(" |");
+				};
+
+				writeDividerLine();
+				writeTextLine(name);
+				writeDividerLine();
+
+				foreach (var child in Properties)
+				{
+					sb.Append("| ");
+					sb.Append(string.Format("{0," + maxPropertyWidth + "}", child.PropertyInfo.Name));
+					sb.Append(" | ");
+					sb.Append(string.Format("{0," + (totalWidth - maxValueWidth-5) + "}", child.Value.Value));
+					sb.AppendLine(" |");
+
+					writeDividerLine();
+				}
+
+				return sb.ToString();
+
+			}
 		}
 
 
-		public override IEnumerable<DumpItemBase> Children
+		public IEnumerable<Property> Properties
 		{
 			get
 			{
 				return _item.GetType()
 					.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-					.Select(propertyInfo => ObjectTypeFactory.Create(propertyInfo.GetValue(_item, new object[0])));
+					.Select(propertyInfo => new Property
+												{
+													PropertyInfo = propertyInfo,
+													Value = ObjectTypeFactory.Create(propertyInfo.GetValue(_item, new object[0]))
+												});
 			}
 		}
 	}
@@ -83,17 +138,10 @@ namespace DumpToText
 		}
 
 		public abstract string Value { get; }
-		public virtual IEnumerable<DumpItemBase> Children
-		{
-			get
-			{
-				return new DumpItemBase[0];
-			}
-		}
 
-		public static string TextForEmptyCollectionOf(Type type)
+		public static string TextForCollectionOf(Type type, int count)
 		{
-			return PrettifyTypeName(type) + " (0 items)";
+			return PrettifyTypeName(type) + " (" + count + " items)";
 		}
 
 		protected static string PrettifyTypeName(Type type)
@@ -103,6 +151,12 @@ namespace DumpToText
 
 			return type.Name;
 		}
+	}
+
+	public class Property
+	{
+		public PropertyInfo PropertyInfo { get; set; }
+		public DumpItemBase Value { get; set; }
 	}
 
 	public class CollectionObject : DumpItemBase
@@ -118,11 +172,23 @@ namespace DumpToText
 		{
 			get
 			{
-				return TextForEmptyCollectionOf(_items.GetType());
+				var sb = new StringBuilder();
+
+				var name = TextForCollectionOf(_items.GetType(), Children.Count());
+
+				sb.Append("|");
+				sb.Append(new string('-', name.Length + 2));
+				sb.AppendLine("|");
+
+				sb.Append("|");
+				sb.Append(name);
+				sb.AppendLine("|");
+
+				return sb.ToString();
 			}
 		}
 
-		public override IEnumerable<DumpItemBase> Children
+		public IEnumerable<DumpItemBase> Children
 		{
 			get
 			{
