@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DumpToText
 {
@@ -13,7 +15,7 @@ namespace DumpToText
 			_o = @object;
 		}
 
-		public override string Text
+		public override string Value
 		{
 			get
 			{
@@ -32,13 +34,42 @@ namespace DumpToText
 			if (item == null)
 				return new ValueObject(item);
 
+			if (item.GetType().IsValueType)
+				return new ValueObject(item);
+
 			if (item is string)
 				return new ValueObject(item);
 
 			if (item is IEnumerable)
 				return new CollectionObject(item);
 
-			return new ValueObject(item);
+			return new ReferenceObject(item);
+		}
+	}
+
+	public class ReferenceObject : DumpItemBase
+	{
+		private readonly object _item;
+
+		public ReferenceObject(object item)
+		{
+			_item = item;
+		}
+
+		public override string Value
+		{
+			get { return PrettifyTypeName(_item.GetType()); }
+		}
+
+
+		public override IEnumerable<DumpItemBase> Children
+		{
+			get
+			{
+				return _item.GetType()
+					.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+					.Select(propertyInfo => ObjectTypeFactory.Create(propertyInfo.GetValue(_item, new object[0])));
+			}
 		}
 	}
 
@@ -50,14 +81,21 @@ namespace DumpToText
 			get { return NullValue; }
 		}
 
-		public abstract string Text { get; }
+		public abstract string Value { get; }
+		public virtual IEnumerable<DumpItemBase> Children
+		{
+			get
+			{
+				return new DumpItemBase[0];
+			}
+		}
 
 		public static string TextForEmptyCollectionOf(Type type)
 		{
 			return PrettifyTypeName(type) + " (0 items)";
 		}
 
-		private static string PrettifyTypeName(Type type)
+		protected static string PrettifyTypeName(Type type)
 		{
 			if (type.IsGenericType)
 				return type.Name.Substring(0, type.Name.Length - 2) + "<" + string.Join(", ", type.GetGenericArguments().Select(PrettifyTypeName).ToArray()) + ">";
@@ -75,12 +113,13 @@ namespace DumpToText
 			_item = item;
 		}
 
-		public override string Text
+		public override string Value
 		{
 			get
 			{
 				return TextForEmptyCollectionOf(_item.GetType());
 			}
 		}
+
 	}
 }

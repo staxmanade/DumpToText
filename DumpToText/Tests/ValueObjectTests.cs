@@ -13,7 +13,7 @@ namespace DumpToText.Tests
 			var dumpItem = ObjectTypeFactory.Create(itemValue);
 			dumpItem.ShouldBeOfType(expectedType);
 
-			dumpItem.Text.ShouldEqual(expectedTextValue);
+			dumpItem.Value.ShouldEqual(expectedTextValue);
 		}
 	}
 }
