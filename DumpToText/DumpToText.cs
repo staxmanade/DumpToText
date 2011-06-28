@@ -103,7 +103,7 @@ namespace DumpToText
 
 				foreach (var child in Properties)
 				{
-					var eachRowInChildItem = child.Value.Value.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+					var eachRowInChildItem = child.Value.Value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
 					sb.Append("| ");
 					sb.Append(string.Format("{0," + maxPropertyWidth + "}", child.PropertyInfo.Name));
@@ -202,8 +202,11 @@ namespace DumpToText
 				var sb = new StringBuilder();
 
 				var name = TextForCollectionOf(_items.GetType(), Children.Count());
+				var dumpItems = (from object item in _items
+								 select ObjectTypeFactory.Create(item)).ToList();
 
 				var totalWidth = name.Length;
+				var valueColumnWidth = dumpItems.Select(s => s.Width).Concat(new[] { totalWidth }).Max();
 
 				Action writeDividerLine = () =>
 				{
@@ -215,20 +218,28 @@ namespace DumpToText
 				Action<string> writeTextLine = lineToWrite =>
 				{
 					sb.Append("| ");
-					sb.Append(lineToWrite);
+					sb.Append(string.Format("{0,-" + (valueColumnWidth) + "}", lineToWrite));
 					sb.AppendLine(" |");
 				};
 
 				writeDividerLine();
 				writeTextLine(name);
-
-				foreach (var item in _items)
-				{
-				    var dumpItem = ObjectTypeFactory.Create(item);
-				    sb.AppendLine(dumpItem.Value);
-				}
-
 				writeDividerLine();
+
+
+				foreach (var dumpItem in dumpItems)
+				{
+					var eachRowInChildItem = dumpItem.Value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+					writeTextLine(eachRowInChildItem.First());
+
+					foreach (var row in eachRowInChildItem.Skip(1))
+					{
+						writeTextLine(row.TrimEnd('\n'));
+					}
+
+					writeDividerLine();
+				}
 
 				return sb.ToString();
 

@@ -131,6 +131,19 @@ You"
 ");
 		}
 
+
+		[Test]
+		public void Simple_array_one_item()
+		{
+			(new [] { 1 }).DumpToText().Trace().ShouldEqual(
+@"|-------------------|
+| Int32[] (1 items) |
+|-------------------|
+| 1                 |
+|-------------------|
+");
+		}
+
 		//[Test]
 		//public void Simple_Dictionary()
 		//{
