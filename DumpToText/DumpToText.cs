@@ -108,7 +108,7 @@ namespace DumpToText
 					sb.Append("| ");
 					sb.Append(string.Format("{0," + maxPropertyWidth + "}", child.PropertyInfo.Name));
 					sb.Append(" | ");
-					sb.Append(string.Format("{0," + (valueColumnWidth) + "}", eachRowInChildItem.First()));
+					sb.Append(string.Format("{0,-" + (valueColumnWidth) + "}", eachRowInChildItem.First()));
 					sb.AppendLine(" |");
 
 					foreach (var row in eachRowInChildItem.Skip(1))
@@ -116,7 +116,7 @@ namespace DumpToText
 						sb.Append("| ");
 						sb.Append(new string(' ', maxPropertyWidth));
 						sb.Append(" | ");
-						sb.Append(string.Format("{0," + valueColumnWidth + "}", row.TrimEnd('\n')));
+						sb.Append(string.Format("{0,-" + valueColumnWidth + "}", row.TrimEnd('\n')));
 						sb.AppendLine(" |");
 					}
 
