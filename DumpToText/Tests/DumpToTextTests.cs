@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace DumpToText.Tests
@@ -45,11 +46,15 @@ namespace DumpToText.Tests
 		[Test]
 		public void Simple_AnonymousType_with_multiline_string()
 		{
-			(new { Foo = 1, Foo2 = @"HELLO
+			(new
+			{
+				Foo = 1,
+				Foo2 = @"HELLO
 World
 How
 Are
-You" }).DumpToText().Trace().ShouldEqual(
+You"
+			}).DumpToText().Trace().ShouldEqual(
 @"|------------------------------------|
 | <>f__AnonymousType1<Int32, String> |
 |------------------------------------|
@@ -97,7 +102,7 @@ How
 Are
 You"
 				}
-			}).DumpToText().Trace().ShouldEqual(
+			}).DumpToText().ShouldEqual(
 @"|---------------------------------------------------------|
 | <>f__AnonymousType1<Int32, <>f__AnonymousType2<String>> |
 |---------------------------------------------------------|
@@ -115,6 +120,27 @@ You"
 |---------------------------------------------------------|
 ");
 		}
+
+		[Test]
+		public void Simple_empty_array()
+		{
+			(new int[0]).DumpToText().Trace().ShouldEqual(
+@"|-------------------|
+| Int32[] (0 items) |
+|-------------------|
+");
+		}
+
+		//[Test]
+		//public void Simple_Dictionary()
+		//{
+		//    var dictionary = new Dictionary<int, string>
+		//    {
+		//        {1, "FOO"},
+		//    };
+
+		//    dictionary.DumpToText().Trace();
+		//}
 	}
 
 	public static class Extensions

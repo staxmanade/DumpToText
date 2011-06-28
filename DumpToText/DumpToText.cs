@@ -203,15 +203,35 @@ namespace DumpToText
 
 				var name = TextForCollectionOf(_items.GetType(), Children.Count());
 
-				sb.Append("|");
-				sb.Append(new string('-', name.Length + 2));
-				sb.AppendLine("|");
+				var totalWidth = name.Length;
 
-				sb.Append("|");
-				sb.Append(name);
-				sb.AppendLine("|");
+				Action writeDividerLine = () =>
+				{
+					sb.Append("|");
+					sb.Append(new string('-', totalWidth + 2));
+					sb.AppendLine("|");
+				};
+
+				Action<string> writeTextLine = lineToWrite =>
+				{
+					sb.Append("| ");
+					sb.Append(lineToWrite);
+					sb.AppendLine(" |");
+				};
+
+				writeDividerLine();
+				writeTextLine(name);
+
+				foreach (var item in _items)
+				{
+				    var dumpItem = ObjectTypeFactory.Create(item);
+				    sb.AppendLine(dumpItem.Value);
+				}
+
+				writeDividerLine();
 
 				return sb.ToString();
+
 			});
 		}
 
