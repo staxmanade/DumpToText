@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
@@ -74,10 +75,14 @@ namespace DumpToText
 				var sb = new StringBuilder();
 
 				var name = PrettifyTypeName(_item.GetType());
+				Trace.WriteLine(name);
 
 				var maxPropertyWidth = Properties.Max(p => p.PropertyInfo.Name.Length);
-				var maxValueWidth = Properties.Max(p => p.Value.Value.Length);
-				var totalWidth = new[] { name.Length , maxPropertyWidth + maxValueWidth }.Max();
+				var maxValueWidth = Properties.Max(p => p.Value.Width);
+				var totalWidth = new[] { name.Length, maxPropertyWidth + maxValueWidth }.Max();
+				Trace.WriteLine("totalWidth=" + totalWidth);
+				Trace.WriteLine("maxPropertyWidth=" + maxPropertyWidth);
+				Trace.WriteLine("maxValueWidth=" + maxValueWidth);
 
 				Action writeDividerLine = () =>
 				{
@@ -102,7 +107,7 @@ namespace DumpToText
 					sb.Append("| ");
 					sb.Append(string.Format("{0," + maxPropertyWidth + "}", child.PropertyInfo.Name));
 					sb.Append(" | ");
-					sb.Append(string.Format("{0," + (totalWidth - maxValueWidth-5) + "}", child.Value.Value));
+					sb.Append(string.Format("{0," + (totalWidth - 3 - maxPropertyWidth) + "}", child.Value.Value));
 					sb.AppendLine(" |");
 
 					writeDividerLine();
@@ -139,6 +144,11 @@ namespace DumpToText
 
 		public abstract string Value { get; }
 
+		public int Width
+		{
+			get { return (Value ?? "").Split('\n').Select(s => s.Length).Max(); }
+		}
+
 		public static string TextForCollectionOf(Type type, int count)
 		{
 			return PrettifyTypeName(type) + " (" + count + " items)";
@@ -162,15 +172,13 @@ namespace DumpToText
 	public class CollectionObject : DumpItemBase
 	{
 		private readonly IEnumerable _items;
+		private readonly Lazy<string> _value;
 
 		public CollectionObject(IEnumerable items)
 		{
 			_items = items;
-		}
 
-		public override string Value
-		{
-			get
+			_value = new Lazy<string>(() =>
 			{
 				var sb = new StringBuilder();
 
@@ -185,7 +193,13 @@ namespace DumpToText
 				sb.AppendLine("|");
 
 				return sb.ToString();
-			}
+			});
+		}
+
+
+		public override string Value
+		{
+			get { return _value.Value; }
 		}
 
 		public IEnumerable<DumpItemBase> Children

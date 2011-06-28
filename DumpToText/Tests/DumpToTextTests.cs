@@ -19,7 +19,7 @@ namespace DumpToText.Tests
 		[Test]
 		public void Simple_AnonymousType()
 		{
-			(new {Foo = 1}).DumpToText().ShouldEqual(
+			(new { Foo = 1 }).DumpToText().Trace().ShouldEqual(
 @"|----------------------------|
 | <>f__AnonymousType0<Int32> |
 |----------------------------|
@@ -28,18 +28,27 @@ namespace DumpToText.Tests
 ");
 		}
 
-//        [Test]
-//        public void Simple_AnonymousType2()
-//        {
-//            (new { Foo = 1, Foo2 = "HELLO" }).DumpToText().ShouldEqual(
-//@"|----------------------------|
-//| <>f__AnonymousType0<Int32> |
-//|----------------------------|
-//| Foo  |                   1 |
-//|----------------------------|
-//| Foo2 |           ""HELLO"" |
-//|----------------------------|
-//");
-//        }
+		[Test]
+		public void Simple_AnonymousType2()
+		{
+			(new { Foo = 1, Foo2 = "HELLO" }).DumpToText().Trace().ShouldEqual(
+@"|------------------------------------|
+| <>f__AnonymousType1<Int32, String> |
+|------------------------------------|
+|  Foo |                           1 |
+|------------------------------------|
+| Foo2 |                       HELLO |
+|------------------------------------|
+");
+		}
+	}
+
+	public static class Extensions
+	{
+		public static T Trace<T>(this T item)
+		{
+			System.Diagnostics.Trace.WriteLine(item.ToString());
+			return item;
+		}
 	}
 }
