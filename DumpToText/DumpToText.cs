@@ -62,15 +62,12 @@ namespace DumpToText
 	public class ReferenceObject : DumpItemBase
 	{
 		private readonly object _item;
+		private Lazy<string> _value;
 
 		public ReferenceObject(object item)
 		{
 			_item = item;
-		}
-
-		public override string Value
-		{
-			get
+			_value = new Lazy<string>(() =>
 			{
 				var sb = new StringBuilder();
 
@@ -102,18 +99,40 @@ namespace DumpToText
 				writeTextLine(name);
 				writeDividerLine();
 
+				var valueColumnWidth = totalWidth - 3 - maxPropertyWidth;
+
 				foreach (var child in Properties)
 				{
+					var eachRowInChildItem = child.Value.Value.Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
 					sb.Append("| ");
 					sb.Append(string.Format("{0," + maxPropertyWidth + "}", child.PropertyInfo.Name));
 					sb.Append(" | ");
-					sb.Append(string.Format("{0," + (totalWidth - 3 - maxPropertyWidth) + "}", child.Value.Value));
+					sb.Append(string.Format("{0," + (valueColumnWidth) + "}", eachRowInChildItem.First()));
 					sb.AppendLine(" |");
+
+					foreach (var row in eachRowInChildItem.Skip(1))
+					{
+						sb.Append("| ");
+						sb.Append(new string(' ', maxPropertyWidth));
+						sb.Append(" | ");
+						sb.Append(string.Format("{0," + valueColumnWidth + "}", row.TrimEnd('\n')));
+						sb.AppendLine(" |");
+					}
+
 
 					writeDividerLine();
 				}
 
 				return sb.ToString();
+			});
+		}
+
+		public override string Value
+		{
+			get
+			{
+				return _value.Value;
 
 			}
 		}
