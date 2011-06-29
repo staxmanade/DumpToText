@@ -9,7 +9,7 @@ namespace DumpToText.Tests
 	{
 		private string TextForEmptyCollectionOf(Type type)
 		{
-			return DumpItemBase.TextForCollectionOf(type, 0);
+			return DumpToTextExtensions.DumpItemBase.TextForCollectionOf(type, 0);
 		}
 
 		[Test]

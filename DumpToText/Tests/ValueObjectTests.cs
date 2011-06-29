@@ -5,12 +5,12 @@ namespace DumpToText.Tests
 {
 	public class ValueObjectTests
 	{
-		[TestCase(typeof(ValueObject), 1, "1")]
-		[TestCase(typeof(ValueObject), "FOO", "FOO")]
-		[TestCase(typeof(ValueObject), null, DumpItemBase.NullValue)]
+		[TestCase(typeof(DumpToTextExtensions.ValueObject), 1, "1")]
+		[TestCase(typeof(DumpToTextExtensions.ValueObject), "FOO", "FOO")]
+		[TestCase(typeof(DumpToTextExtensions.ValueObject), null, DumpToTextExtensions.DumpItemBase.NullValue)]
 		public void ValueTests(Type expectedType, object itemValue, string expectedTextValue)
 		{
-			var dumpItem = ObjectTypeFactory.Create(itemValue);
+			var dumpItem = DumpToTextExtensions.ObjectTypeFactory.Create(itemValue);
 			dumpItem.ShouldBeOfType(expectedType);
 
 			dumpItem.Value.ShouldEqual(expectedTextValue);
