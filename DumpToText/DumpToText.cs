@@ -69,26 +69,25 @@ namespace DumpToText
 				var sb = new StringBuilder();
 
 
-				var maxPropertyWidth = Properties.Max(p => p.PropertyInfo.Name.Length);
-				var maxValueWidth = Properties.Max(p => p.Value.Width);
-				var totalWidth = new[] { Name.Length, maxPropertyWidth + maxValueWidth }.Max();
+				var maxPropertyNameWidth = Properties.Max(p => p.PropertyInfo.Name.Length);
+				var maxPropertyValueWidth = Properties.Max(p => p.Value.ValueWidth);
+				var totalWidth = new[] { Name.Length, (maxPropertyNameWidth + 3 + maxPropertyValueWidth) }.Max();
 				Trace.WriteLine(Name);
 				Trace.WriteLine("totalWidth=" + totalWidth);
-				Trace.WriteLine("maxPropertyWidth=" + maxPropertyWidth);
-				Trace.WriteLine("maxValueWidth=" + maxValueWidth);
+				Trace.WriteLine("maxPropertyWidth=" + maxPropertyNameWidth);
+				Trace.WriteLine("maxValueWidth=" + maxPropertyValueWidth);
 
 				Action writeDividerLine = () =>
 				{
 					sb.Append("|");
-					sb.Append(new string('-', totalWidth + 2 + 3));
+					sb.Append(new string('-', totalWidth + 2));
 					sb.AppendLine("|");
 				};
 
 				Action<string> writeTextLine = lineToWrite =>
 				{
 					sb.Append("| ");
-					sb.Append(string.Format("{0,-" + (totalWidth + 3) + "}", lineToWrite));
-					//sb.Append(lineToWrite);
+					sb.Append(string.Format("{0,-" + (totalWidth) + "}", lineToWrite));
 					sb.AppendLine(" |");
 				};
 
@@ -96,14 +95,14 @@ namespace DumpToText
 				writeTextLine(Name);
 				writeDividerLine();
 
-				var valueColumnWidth = totalWidth - maxPropertyWidth;
+				var valueColumnWidth = totalWidth - (maxPropertyNameWidth + 3);
 
 				foreach (var child in Properties)
 				{
 					var eachRowInChildItem = child.Value.Value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
 					sb.Append("| ");
-					sb.Append(string.Format("{0," + maxPropertyWidth + "}", child.PropertyInfo.Name));
+					sb.Append(string.Format("{0," + maxPropertyNameWidth + "}", child.PropertyInfo.Name));
 					sb.Append(" | ");
 					sb.Append(string.Format("{0,-" + (valueColumnWidth) + "}", eachRowInChildItem.First()));
 					sb.AppendLine(" |");
@@ -111,7 +110,7 @@ namespace DumpToText
 					foreach (var row in eachRowInChildItem.Skip(1))
 					{
 						sb.Append("| ");
-						sb.Append(new string(' ', maxPropertyWidth));
+						sb.Append(new string(' ', maxPropertyNameWidth));
 						sb.Append(" | ");
 						sb.Append(string.Format("{0,-" + valueColumnWidth + "}", row.TrimEnd('\n')));
 						sb.AppendLine(" |");
@@ -166,13 +165,12 @@ namespace DumpToText
 
 		public abstract string Value { get; }
 
-		public int Width
+		public int ValueWidth
 		{
 			get
 			{
 				var childrenWidth = (Value ?? "").Split('\n').Select(s => s.Length).Max();
-				var nameWidth = Name.Length;
-				return new[] { childrenWidth, nameWidth }.Max();
+				return childrenWidth;
 			}
 		}
 
@@ -204,7 +202,7 @@ namespace DumpToText
 	public class CollectionObject : DumpItemBase
 	{
 		private readonly Lazy<string> _value;
-		public IEnumerable Items { get { return (IEnumerable) _item; } }
+		public IEnumerable Items { get { return (IEnumerable)_item; } }
 
 		public CollectionObject(IEnumerable items)
 			: base(items)
@@ -219,7 +217,7 @@ namespace DumpToText
 								 select ObjectTypeFactory.Create(item)).ToList();
 
 				var totalWidth = name.Length;
-				var valueColumnWidth = dumpItems.Select(s => s.Width).Concat(new[] { totalWidth }).Max();
+				var valueColumnWidth = dumpItems.Select(s => s.ValueWidth).Concat(new[] { totalWidth }).Max();
 
 				Action writeDividerLine = () =>
 				{
