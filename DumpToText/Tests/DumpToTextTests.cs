@@ -8,19 +8,19 @@ namespace DumpToText.Tests
 		[Test]
 		public void Simple_Value_int()
 		{
-			1.DumpToText().ShouldEqual("1");
+			1.DumpToTextValue().ShouldEqual("1");
 		}
 
 		[Test]
 		public void Simple_Value_string()
 		{
-			"HELLO".DumpToText().ShouldEqual("HELLO");
+			"HELLO".DumpToTextValue().ShouldEqual("HELLO");
 		}
 
 		[Test]
 		public void Simple_AnonymousType()
 		{
-			(new { Foo = 1 }).DumpToText().Trace().ShouldEqual(
+			(new { Foo = 1 }).DumpToTextValue().Trace().ShouldEqual(
 @"|----------------------------|
 | <>f__AnonymousType0<Int32> |
 |----------------------------|
@@ -32,7 +32,7 @@ namespace DumpToText.Tests
 		[Test]
 		public void Simple_AnonymousType2()
 		{
-			(new { Foo = 1, Foo2 = "HELLO" }).DumpToText().Trace().ShouldEqual(
+			(new { Foo = 1, Foo2 = "HELLO" }).DumpToTextValue().Trace().ShouldEqual(
 @"|------------------------------------|
 | <>f__AnonymousType1<Int32, String> |
 |------------------------------------|
@@ -54,7 +54,7 @@ World
 How
 Are
 You"
-			}).DumpToText().Trace().ShouldEqual(
+			}).DumpToTextValue().Trace().ShouldEqual(
 @"|------------------------------------|
 | <>f__AnonymousType1<Int32, String> |
 |------------------------------------|
@@ -72,7 +72,7 @@ You"
 		[Test]
 		public void Simple_Nested_AnonymousType2()
 		{
-			(new { Foo = 1, Foo2 = new { Bar = 1.234m } }).DumpToText().Trace().ShouldEqual(
+			(new { Foo = 1, Foo2 = new { Bar = 1.234m } }).DumpToTextValue().Trace().ShouldEqual(
 @"|----------------------------------------------------------|
 | <>f__AnonymousType1<Int32, <>f__AnonymousType2<Decimal>> |
 |----------------------------------------------------------|
@@ -102,7 +102,7 @@ How
 Are
 You"
 				}
-			}).DumpToText().ShouldEqual(
+			}).DumpToTextValue().ShouldEqual(
 @"|---------------------------------------------------------|
 | <>f__AnonymousType1<Int32, <>f__AnonymousType2<String>> |
 |---------------------------------------------------------|
@@ -124,7 +124,7 @@ You"
 		[Test]
 		public void Simple_empty_array()
 		{
-			(new int[0]).DumpToText().Trace().ShouldEqual(
+			(new int[0]).DumpToTextValue().Trace().ShouldEqual(
 @"|-------------------|
 | Int32[] (0 items) |
 |-------------------|
@@ -135,7 +135,7 @@ You"
 		[Test]
 		public void Simple_array_one_item()
 		{
-			(new[] { 1 }).DumpToText().Trace().ShouldEqual(
+			(new[] { 1 }).DumpToTextValue().Trace().ShouldEqual(
 @"|-------------------|
 | Int32[] (1 items) |
 |-------------------|
@@ -157,7 +157,7 @@ You"
 		        {10000, "FOO"},
 		    };
 
-			dictionary.DumpToText().Trace();
+			dictionary.DumpToTextValue().Trace();
 		}
 
 
@@ -170,7 +170,7 @@ You"
 				new {Name = "Bar", Value = 1.45m},
 			};
 
-			items.DumpToText().Trace().ShouldEqual(
+			items.DumpToTextValue().Trace().ShouldEqual(
 				@"|-------------------------------------------|
 | <>f__AnonymousType3`2[] (2 items)         |
 |-------------------------------------------|
@@ -197,7 +197,7 @@ You"
 		public void ComplexType()
 		{
 			ComplexTypeParent complexTypeParent = GetComplexTypeParent();
-			complexTypeParent.DumpToText().Trace().ShouldEqual(
+			complexTypeParent.DumpToTextValue().Trace().ShouldEqual(
 @"|-------------------------------------------------------------------|
 | ComplexTypeParent                                                 |
 |-------------------------------------------------------------------|
@@ -263,7 +263,7 @@ You"
 				GetComplexTypeParent(),
 			};
 
-			items.DumpToText().Trace();
+			items.DumpToTextValue().Trace();
 		}
 
 		private ComplexTypeParent GetComplexTypeParent()
