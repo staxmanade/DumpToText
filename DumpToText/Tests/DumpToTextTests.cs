@@ -135,7 +135,7 @@ You"
 		[Test]
 		public void Simple_array_one_item()
 		{
-			(new [] { 1 }).DumpToText().Trace().ShouldEqual(
+			(new[] { 1 }).DumpToText().Trace().ShouldEqual(
 @"|-------------------|
 | Int32[] (1 items) |
 |-------------------|
@@ -144,16 +144,54 @@ You"
 ");
 		}
 
-		//[Test]
-		//public void Simple_Dictionary()
-		//{
-		//    var dictionary = new Dictionary<int, string>
-		//    {
-		//        {1, "FOO"},
-		//    };
+		[Test]
+		public void Simple_Dictionary()
+		{
+			var dictionary = new Dictionary<int, string>
+		    {
+		        {1, "FOO"},
+		        {2, "FOOTee Doo"},
+		        {10, "FOO"},
+		        {100, "FOO"},
+		        {1000, "FOO"},
+		        {10000, "FOO"},
+		    };
 
-		//    dictionary.DumpToText().Trace();
-		//}
+			dictionary.DumpToText().Trace();
+		}
+
+
+		[Test]
+		public void Simple_collection_of_custom_objects()
+		{
+			var items = new[]
+			{
+				new {Name = "FOO", Value = 1m},
+				new {Name = "Bar", Value = 1.45m},
+			};
+
+			items.DumpToText().Trace().ShouldEqual(
+				@"|-------------------------------------------|
+| <>f__AnonymousType3`2[] (2 items)         |
+|-------------------------------------------|
+| |--------------------------------------|  |
+| | <>f__AnonymousType3<String, Decimal> |  |
+| |--------------------------------------|  |
+| |  Name | FOO                          |  |
+| |--------------------------------------|  |
+| | Value | 1                            |  |
+| |--------------------------------------|  |
+|-------------------------------------------|
+| |--------------------------------------|  |
+| | <>f__AnonymousType3<String, Decimal> |  |
+| |--------------------------------------|  |
+| |  Name | Bar                          |  |
+| |--------------------------------------|  |
+| | Value | 1.45                         |  |
+| |--------------------------------------|  |
+|-------------------------------------------|
+");
+		}
 	}
 
 	public static class Extensions

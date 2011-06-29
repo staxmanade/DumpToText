@@ -19,21 +19,19 @@ namespace DumpToText
 	}
 	public class ValueObject : DumpItemBase
 	{
-		private readonly object _o;
-
 		public ValueObject(object @object)
+			: base(@object)
 		{
-			_o = @object;
 		}
 
 		public override string Value
 		{
 			get
 			{
-				if (_o == null)
+				if (_item == null)
 					return "<NULL>";
 
-				return _o.ToString();
+				return _item.ToString();
 			}
 		}
 	}
@@ -61,22 +59,19 @@ namespace DumpToText
 
 	public class ReferenceObject : DumpItemBase
 	{
-		private readonly object _item;
-		private Lazy<string> _value;
+		private readonly Lazy<string> _value;
 
 		public ReferenceObject(object item)
+			: base(item)
 		{
-			_item = item;
 			_value = new Lazy<string>(() =>
 			{
 				var sb = new StringBuilder();
 
-				var name = PrettifyTypeName(_item.GetType());
-				Trace.WriteLine(name);
 
 				var maxPropertyWidth = Properties.Max(p => p.PropertyInfo.Name.Length);
 				var maxValueWidth = Properties.Max(p => p.Value.Width);
-				var totalWidth = new[] { name.Length, maxPropertyWidth + maxValueWidth }.Max();
+				var totalWidth = new[] { Name.Length, maxPropertyWidth + maxValueWidth }.Max();
 				Trace.WriteLine("totalWidth=" + totalWidth);
 				Trace.WriteLine("maxPropertyWidth=" + maxPropertyWidth);
 				Trace.WriteLine("maxValueWidth=" + maxValueWidth);
@@ -96,7 +91,7 @@ namespace DumpToText
 				};
 
 				writeDividerLine();
-				writeTextLine(name);
+				writeTextLine(Name);
 				writeDividerLine();
 
 				var valueColumnWidth = totalWidth - 3 - maxPropertyWidth;
@@ -137,7 +132,6 @@ namespace DumpToText
 			}
 		}
 
-
 		public IEnumerable<Property> Properties
 		{
 			get
@@ -155,6 +149,13 @@ namespace DumpToText
 
 	public abstract class DumpItemBase
 	{
+		protected object _item;
+
+		protected DumpItemBase(object item)
+		{
+			_item = item;
+		}
+
 		public const string NullValue = "<NULL>";
 		protected string NullString
 		{
@@ -165,7 +166,17 @@ namespace DumpToText
 
 		public int Width
 		{
-			get { return (Value ?? "").Split('\n').Select(s => s.Length).Max(); }
+			get
+			{
+				var childrenWidth = (Value ?? "").Split('\n').Select(s => s.Length).Max();
+				var nameWidth = Name.Length;
+				return new[] { childrenWidth, nameWidth }.Max();
+			}
+		}
+
+		public virtual string Name
+		{
+			get { return PrettifyTypeName(_item.GetType()); }
 		}
 
 		public static string TextForCollectionOf(Type type, int count)
@@ -190,19 +201,19 @@ namespace DumpToText
 
 	public class CollectionObject : DumpItemBase
 	{
-		private readonly IEnumerable _items;
 		private readonly Lazy<string> _value;
+		public IEnumerable Items { get { return (IEnumerable) _item; } }
 
 		public CollectionObject(IEnumerable items)
+			: base(items)
 		{
-			_items = items;
 
 			_value = new Lazy<string>(() =>
 			{
 				var sb = new StringBuilder();
 
-				var name = TextForCollectionOf(_items.GetType(), Children.Count());
-				var dumpItems = (from object item in _items
+				var name = TextForCollectionOf(Items.GetType(), Children.Count());
+				var dumpItems = (from object item in Items
 								 select ObjectTypeFactory.Create(item)).ToList();
 
 				var totalWidth = name.Length;
@@ -211,7 +222,7 @@ namespace DumpToText
 				Action writeDividerLine = () =>
 				{
 					sb.Append("|");
-					sb.Append(new string('-', totalWidth + 2));
+					sb.Append(new string('-', valueColumnWidth + 2));
 					sb.AppendLine("|");
 				};
 
@@ -227,15 +238,15 @@ namespace DumpToText
 				writeDividerLine();
 
 
-				foreach (var dumpItem in dumpItems)
+				foreach (DumpItemBase dumpItem in dumpItems)
 				{
 					var eachRowInChildItem = dumpItem.Value.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
 					writeTextLine(eachRowInChildItem.First());
 
-					foreach (var row in eachRowInChildItem.Skip(1))
+					foreach (string row in eachRowInChildItem.Skip(1))
 					{
-						writeTextLine(row.TrimEnd('\n'));
+						writeTextLine(row);
 					}
 
 					writeDividerLine();
@@ -256,7 +267,7 @@ namespace DumpToText
 		{
 			get
 			{
-				foreach (var item in _items)
+				foreach (var item in Items)
 				{
 					yield return ObjectTypeFactory.Create(item);
 				}
