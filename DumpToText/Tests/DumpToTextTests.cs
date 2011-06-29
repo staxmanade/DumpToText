@@ -192,6 +192,98 @@ You"
 |-------------------------------------------|
 ");
 		}
+
+		[Test]
+		public void ComplexType()
+		{
+			var complexTypeParent = new ComplexTypeParent
+			{
+				Name = "SomeName",
+				ComplexChildObjects = new List<ComplexChildObject>
+					{
+						new ComplexChildObject {Name = "FOO", Value = 1.2m},
+						new ComplexChildObject {Name = "Hello", Value = 10.2m},
+						new ComplexChildObject {Name = "World", Value = 100.2m},
+					},
+				ListOfItems = new List<string> { "a", "b", "c" },
+				SomeDictionaryOfStuff = new Dictionary<string, string>
+					{
+						{"a", "1"},
+						{"b", "10"},
+						{"c", "100"},
+					}
+			};
+			complexTypeParent.DumpToText().Trace().ShouldEqual(
+@"|-------------------------------------------------------------------|
+| ComplexTypeParent                                                 |
+|-------------------------------------------------------------------|
+|                  Name | SomeName                                  |
+|-------------------------------------------------------------------|
+|           ListOfItems | |------------------------|                |
+|                       | | List<String> (3 items) |                |
+|                       | |------------------------|                |
+|                       | | a                      |                |
+|                       | |------------------------|                |
+|                       | | b                      |                |
+|                       | |------------------------|                |
+|                       | | c                      |                |
+|                       | |------------------------|                |
+|-------------------------------------------------------------------|
+| SomeDictionaryOfStuff | |--------------------------------------|  |
+|                       | | Dictionary<String, String> (3 items) |  |
+|                       | |--------------------------------------|  |
+|                       | | [a, 1]                               |  |
+|                       | |--------------------------------------|  |
+|                       | | [b, 10]                              |  |
+|                       | |--------------------------------------|  |
+|                       | | [c, 100]                             |  |
+|                       | |--------------------------------------|  |
+|-------------------------------------------------------------------|
+|   ComplexChildObjects | |------------------------------------|    |
+|                       | | List<ComplexChildObject> (3 items) |    |
+|                       | |------------------------------------|    |
+|                       | | |-----------------------|          |    |
+|                       | | | ComplexChildObject    |          |    |
+|                       | | |-----------------------|          |    |
+|                       | | |  Name | FOO           |          |    |
+|                       | | |-----------------------|          |    |
+|                       | | | Value | 1.2           |          |    |
+|                       | | |-----------------------|          |    |
+|                       | |------------------------------------|    |
+|                       | | |-----------------------|          |    |
+|                       | | | ComplexChildObject    |          |    |
+|                       | | |-----------------------|          |    |
+|                       | | |  Name | Hello         |          |    |
+|                       | | |-----------------------|          |    |
+|                       | | | Value | 10.2          |          |    |
+|                       | | |-----------------------|          |    |
+|                       | |------------------------------------|    |
+|                       | | |-----------------------|          |    |
+|                       | | | ComplexChildObject    |          |    |
+|                       | | |-----------------------|          |    |
+|                       | | |  Name | World         |          |    |
+|                       | | |-----------------------|          |    |
+|                       | | | Value | 100.2         |          |    |
+|                       | | |-----------------------|          |    |
+|                       | |------------------------------------|    |
+|-------------------------------------------------------------------|
+");
+		}
+
+		public class ComplexTypeParent
+		{
+			public string Name { get; set; }
+			public IEnumerable<string> ListOfItems { get; set; }
+			public IDictionary<string, string> SomeDictionaryOfStuff { get; set; }
+			public List<ComplexChildObject> ComplexChildObjects { get; set; }
+		}
+		public class ComplexChildObject
+		{
+			public string Name { get; set; }
+			public decimal Value { get; set; }
+		}
+
+
 	}
 
 	public static class Extensions

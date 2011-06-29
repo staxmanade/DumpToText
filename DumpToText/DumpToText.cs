@@ -72,6 +72,7 @@ namespace DumpToText
 				var maxPropertyWidth = Properties.Max(p => p.PropertyInfo.Name.Length);
 				var maxValueWidth = Properties.Max(p => p.Value.Width);
 				var totalWidth = new[] { Name.Length, maxPropertyWidth + maxValueWidth }.Max();
+				Trace.WriteLine(Name);
 				Trace.WriteLine("totalWidth=" + totalWidth);
 				Trace.WriteLine("maxPropertyWidth=" + maxPropertyWidth);
 				Trace.WriteLine("maxValueWidth=" + maxValueWidth);
@@ -79,14 +80,15 @@ namespace DumpToText
 				Action writeDividerLine = () =>
 				{
 					sb.Append("|");
-					sb.Append(new string('-', totalWidth + 2));
+					sb.Append(new string('-', totalWidth + 2 + 3));
 					sb.AppendLine("|");
 				};
 
 				Action<string> writeTextLine = lineToWrite =>
 				{
 					sb.Append("| ");
-					sb.Append(lineToWrite);
+					sb.Append(string.Format("{0,-" + (totalWidth + 3) + "}", lineToWrite));
+					//sb.Append(lineToWrite);
 					sb.AppendLine(" |");
 				};
 
@@ -94,7 +96,7 @@ namespace DumpToText
 				writeTextLine(Name);
 				writeDividerLine();
 
-				var valueColumnWidth = totalWidth - 3 - maxPropertyWidth;
+				var valueColumnWidth = totalWidth - maxPropertyWidth;
 
 				foreach (var child in Properties)
 				{
