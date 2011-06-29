@@ -196,23 +196,7 @@ You"
 		[Test]
 		public void ComplexType()
 		{
-			var complexTypeParent = new ComplexTypeParent
-			{
-				Name = "SomeName",
-				ComplexChildObjects = new List<ComplexChildObject>
-					{
-						new ComplexChildObject {Name = "FOO", Value = 1.2m},
-						new ComplexChildObject {Name = "Hello", Value = 10.2m},
-						new ComplexChildObject {Name = "World", Value = 100.2m},
-					},
-				ListOfItems = new List<string> { "a", "b", "c" },
-				SomeDictionaryOfStuff = new Dictionary<string, string>
-					{
-						{"a", "1"},
-						{"b", "10"},
-						{"c", "100"},
-					}
-			};
+			ComplexTypeParent complexTypeParent = GetComplexTypeParent();
 			complexTypeParent.DumpToText().Trace().ShouldEqual(
 @"|-------------------------------------------------------------------|
 | ComplexTypeParent                                                 |
@@ -268,6 +252,39 @@ You"
 |                       | |------------------------------------|    |
 |-------------------------------------------------------------------|
 ");
+		}
+
+		[Test]
+		public void ComplexType_ListOf()
+		{
+			var items = new List<ComplexTypeParent>
+			{
+				GetComplexTypeParent(),
+				GetComplexTypeParent(),
+			};
+
+			items.DumpToText().Trace();
+		}
+
+		private ComplexTypeParent GetComplexTypeParent()
+		{
+			return new ComplexTypeParent
+					{
+						Name = "SomeName",
+						ComplexChildObjects = new List<ComplexChildObject>
+			       		                      	{
+			       		                      		new ComplexChildObject {Name = "FOO", Value = 1.2m},
+			       		                      		new ComplexChildObject {Name = "Hello", Value = 10.2m},
+			       		                      		new ComplexChildObject {Name = "World", Value = 100.2m},
+			       		                      	},
+						ListOfItems = new List<string> { "a", "b", "c" },
+						SomeDictionaryOfStuff = new Dictionary<string, string>
+			       		                        	{
+			       		                        		{"a", "1"},
+			       		                        		{"b", "10"},
+			       		                        		{"c", "100"},
+			       		                        	}
+					};
 		}
 
 		public class ComplexTypeParent
