@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>DumpToText</id>
+    <version>0.1</version>
+    <title />
+    <authors>Jason Jarrett</authors>
+    <owners />
+    <projectUrl>https://github.com/staxmanade/DumpToText</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Provides the ability to dump an object's value (recursively) for easy visualization of it's state. Great for use while needing to visualize an object while running a unit test. </description>
+    <summary />
+  </metadata>
+</package>
