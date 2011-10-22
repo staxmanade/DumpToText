@@ -61,10 +61,10 @@ namespace DumpToText
 			{
 				get
 				{
-					if (_item == null)
+					if (Item == null)
 						return "<NULL>";
 
-					return _item.ToString();
+					return Item.ToString();
 				}
 			}
 		}
@@ -74,7 +74,7 @@ namespace DumpToText
 			public static DumpItemBase Create(object item)
 			{
 				if (item == null)
-					return new ValueObject(item);
+					return new ValueObject(null);
 
 				if (item.GetType().IsValueType)
 					return new ValueObject(item);
@@ -145,7 +145,6 @@ namespace DumpToText
 							sb.AppendLine(" |");
 						}
 
-
 						writeDividerLine();
 					}
 
@@ -166,12 +165,12 @@ namespace DumpToText
 			{
 				get
 				{
-					return _item.GetType()
+					return Item.GetType()
 						.GetProperties(BindingFlags.Public | BindingFlags.Instance)
 						.Select(propertyInfo => new Property
 						{
 							PropertyInfo = propertyInfo,
-							Value = ObjectTypeFactory.Create(propertyInfo.GetValue(_item, new object[0]))
+							Value = ObjectTypeFactory.Create(propertyInfo.GetValue(Item, new object[0]))
 						});
 				}
 			}
@@ -179,11 +178,11 @@ namespace DumpToText
 
 		public abstract class DumpItemBase
 		{
-			protected object _item;
+			protected object Item;
 
 			protected DumpItemBase(object item)
 			{
-				_item = item;
+				Item = item;
 			}
 
 			public const string NullValue = "<NULL>";
@@ -205,7 +204,7 @@ namespace DumpToText
 
 			public virtual string Name
 			{
-				get { return PrettifyTypeName(_item.GetType()); }
+				get { return PrettifyTypeName(Item.GetType()); }
 			}
 
 			public static string TextForCollectionOf(Type type, int count)
@@ -231,7 +230,7 @@ namespace DumpToText
 		public class CollectionObject : DumpItemBase
 		{
 			private readonly Lazy<string> _value;
-			public IEnumerable Items { get { return (IEnumerable)_item; } }
+			public IEnumerable Items { get { return (IEnumerable)Item; } }
 
 			public CollectionObject(IEnumerable items)
 				: base(items)
