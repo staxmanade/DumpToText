@@ -21,7 +21,14 @@ namespace DumpToText
 		/// DumpToText.DumpToTextExtensions.DumpToTextWriterImplementation = msg => System.Console.WriteLine(msg);
 		/// </code>
 		/// </summary>
-		public static Action<string> DumpToTextWriterImplementation = msg => Trace.WriteLine(msg);
+		public static Action<string> DumpToTextWriterImplementation = msg =>
+		                                                                  {
+#if SILVERLIGHT
+                                                                              Console.WriteLine(msg);
+#else
+                                                                              Trace.WriteLine(msg);
+#endif
+                                                                          };
 
 		/// <summary>
 		/// Will create a string representation of the object and write it to the DumpToTextWriterImplementation.

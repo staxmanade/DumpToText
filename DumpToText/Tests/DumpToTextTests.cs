@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -307,8 +308,12 @@ You"
 	{
 		public static T Trace<T>(this T item)
 		{
-			System.Diagnostics.Trace.WriteLine(item.ToString());
-			return item;
+#if SILVERLIGHT
+            Console.WriteLine(item.ToString());
+#else
+            System.Diagnostics.Trace.WriteLine(item.ToString());
+#endif
+            return item;
 		}
 	}
 }
