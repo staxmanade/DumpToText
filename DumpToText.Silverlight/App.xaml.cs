@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using Microsoft.Silverlight.Testing;
+using Microsoft.Silverlight.Testing.UnitTesting.Metadata.NUnit;
 
 namespace DumpToText.Silverlight
 {
@@ -17,7 +19,9 @@ namespace DumpToText.Silverlight
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            this.RootVisual = Microsoft.Silverlight.Testing.UnitTestSystem.CreateTestPage();
+            UnitTestSystem.RegisterUnitTestProvider(new NUnitProvider());
+
+            this.RootVisual = UnitTestSystem.CreateTestPage();
         }
 
         private void Application_Exit(object sender, EventArgs e)
