@@ -53,3 +53,11 @@ Given the following sample code. The `foo.DumpToText();`...
     |             | | Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut a tortor vitae eros hendrerit imperdiet vitae vel neque. |  |
     |             | |----------------------------------------------------------------------------------------------------------------------|  |
     |-----------------------------------------------------------------------------------------------------------------------------------------|
+
+
+How can I control where the output is placed?
+--
+
+You can control how the output is written by replacing the default implementation the `Action<string> DumpToTextWriterImplementation` method.
+
+    DumpToTextExtensions.DumpToTextWriterImplementation = (string msg) => { /* your output implementation */ };
